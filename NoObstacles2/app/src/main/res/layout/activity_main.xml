@@ -13,7 +13,14 @@
         <!--android:layout_centerHorizontal="true"-->
         <!--android:layout_centerVertical="true"-->
         <!--android:text="Hello!" />-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/report_problem"
+        android:layout_gravity="center_horizontal"
 
+        />
     <TextView
         android:id="@+id/tv_latitude"
         android:layout_width="wrap_content"
@@ -21,8 +28,10 @@
 
     <TextView
         android:id="@+id/tv_longitude"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -30,7 +39,8 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context="com.example.marina.noobstacles.MainActivity" />
+
 
 </LinearLayout>

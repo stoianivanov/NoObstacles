@@ -2,6 +2,7 @@ package com.example.marina.noobstacles;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -10,6 +11,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,7 +30,8 @@ import org.w3c.dom.Text;
 public class MainActivity extends FragmentActivity implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        View.OnClickListener {
     // LocationListener {
 
     private GoogleMap mMap;
@@ -36,6 +40,8 @@ public class MainActivity extends FragmentActivity implements
 
     private TextView textViewLatitude;
     private TextView textViewLongitude;
+
+    private Button mProblemBtn;
 
 //    protected LocationManager locationManager;
 //    protected LocationListener locationListener;
@@ -68,6 +74,9 @@ public class MainActivity extends FragmentActivity implements
                     .build();
         }
 
+
+        mProblemBtn =(Button) findViewById(R.id.report_problem);
+        mProblemBtn.setOnClickListener(this);
 //        txtLat = (TextView) findViewById(R.id.textview1);
 //
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -174,5 +183,14 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if(id == mProblemBtn.getId()){
+            Intent intent = new Intent(this, ReportForm.class);
+            startActivity(intent);
+        }
     }
 }
