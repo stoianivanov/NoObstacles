@@ -43,6 +43,9 @@ public class MainActivity extends FragmentActivity implements
 
     private Button mProblemBtn;
 
+    private Double lat;
+    private Double lng;
+
 //    protected LocationManager locationManager;
 //    protected LocationListener locationListener;
 //    protected Context context;
@@ -154,7 +157,9 @@ public class MainActivity extends FragmentActivity implements
                 mGoogleApiClient);
         if (mLastLocation != null) {
             textViewLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
+            lat = mLastLocation.getLatitude();
             textViewLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
+            lng = mLastLocation.getLongitude();
 
             Log.d("Latitude", String.valueOf(mLastLocation.getLatitude()));
             Log.d("Longitude", String.valueOf(mLastLocation.getLongitude()));
@@ -190,6 +195,8 @@ public class MainActivity extends FragmentActivity implements
         int id = view.getId();
         if(id == mProblemBtn.getId()){
             Intent intent = new Intent(this, ReportForm.class);
+            intent.putExtra("Latitude", lat.toString());
+            intent.putExtra("Longitude", lng.toString());
             startActivity(intent);
         }
     }
