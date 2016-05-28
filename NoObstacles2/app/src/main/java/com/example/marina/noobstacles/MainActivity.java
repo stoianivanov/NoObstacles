@@ -106,11 +106,6 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
 //    @Override
@@ -155,6 +150,10 @@ public class MainActivity extends FragmentActivity implements
         if (mLastLocation != null) {
             textViewLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
             textViewLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
+
+            LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(currentLocation).title("You are here!"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
 
             Log.d("Latitude", String.valueOf(mLastLocation.getLatitude()));
             Log.d("Longitude", String.valueOf(mLastLocation.getLongitude()));
