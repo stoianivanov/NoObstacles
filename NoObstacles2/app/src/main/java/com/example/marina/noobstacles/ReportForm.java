@@ -27,7 +27,14 @@ import java.util.Arrays;
 
 public class ReportForm extends Activity {
 
-    String[] problems = {"Липса на рампа/асансьор",
+    String[] problems = {
+            "Налична рампа/асансьор",
+            "Автобус пригоден за хора с затруднен достъп",
+            "Тротоар пригоден за хора с затруднен достъп",
+            "Приспособена тоалетна за хора с затруднен достъп",
+            "Кръстовище пригодено за хора с затруднен достъп",
+            "Заведение за хранене пригодено за хора с затруднен достъп",
+            "Липса на рампа/асансьор",
             "Неработеща рампа/асансьор",
             "Неравности/дупки",
             "Автомобили върху тротоар",
@@ -64,33 +71,57 @@ public class ReportForm extends Activity {
                 String typeBg = textViewProblems.getText().toString();
                 Log.d("FFFFFFFFF","" +l);
                 int index = Arrays.asList(problems).indexOf(l);
-
+                int state = 0;
                 switch ((int)l) {
                     case 0:
-                        type = "noramp";
+                        type = "ramp";
+                        state = 1;
                         break;
                     case 1:
-                        type = "brkramp";
+                        type = "bus";
+                        state = 1;
                         break;
                     case 2:
-                        type = "hole";
+                        type = "aleq";
+                        state = 1;
                         break;
                     case 3:
-                        type = "car";
+                        type = "wc";
+                        state = 1;
                         break;
                     case 4:
-                        type = "pavement";
+                        type = "crsrd";
+                        state = 1;
                         break;
                     case 5:
-                        type = "bus";
+                        type = "dinner";
+                        state = 1;
                         break;
                     case 6:
-                        type = "roadblock";
+                        type = "noramp";
                         break;
                     case 7:
-                        type = "tempblock";
+                        type = "brkramp";
                         break;
                     case 8:
+                        type = "hole";
+                        break;
+                    case 9:
+                        type = "car";
+                        break;
+                    case 10:
+                        type = "pavement";
+                        break;
+                    case 11:
+                        type = "bus";
+                        break;
+                    case 12:
+                        type = "roadblock";
+                        break;
+                    case 13:
+                        type = "tempblock";
+                        break;
+                    case 14:
                         type = "other";
                         break;
                     default:
@@ -99,7 +130,7 @@ public class ReportForm extends Activity {
                 }
 
                 Log.d("Type", type);
-                int state = 0;
+
 
                 Obstacle obstacle = new Obstacle(latitude, longitude, type, state);
                 Gson gsonObstacle = new Gson();

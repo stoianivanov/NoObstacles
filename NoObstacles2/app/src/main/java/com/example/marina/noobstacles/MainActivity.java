@@ -59,7 +59,7 @@ public class MainActivity extends FragmentActivity implements
     private ArrayList<LatLng> markerPoints;
     private TextView textViewLatitude;
     private TextView textViewLongitude;
-
+    private  RequestObstacles obstaclesss;
     private Button mProblemBtn;
 
     private Double lat;
@@ -78,6 +78,8 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        obstaclesss = new RequestObstacles();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -106,7 +108,7 @@ public class MainActivity extends FragmentActivity implements
 
             @Override
             public void onMapClick(LatLng point) {
-
+                Log.d("NONONONONO", obstaclesss.getNoObstacles().get(0).toString());
                 // Already two locations
                 if (markerPoints.size() > 0) {
                     markerPoints.clear();
@@ -280,6 +282,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onClick(View view) {
+
         int id = view.getId();
         if (id == mProblemBtn.getId()) {
             Intent intent = new Intent(this, ReportForm.class);

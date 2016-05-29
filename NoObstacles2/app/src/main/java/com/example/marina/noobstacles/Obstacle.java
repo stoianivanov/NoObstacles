@@ -28,6 +28,16 @@ public class Obstacle {
         this.latitude = latitude;
     }
 
+    @Override
+    public String toString() {
+        return "Obstacle{" +
+                "latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", type='" + type + '\'' +
+                ", state=" + state +
+                '}';
+    }
+
     public double getLongitude() {
         return longitude;
     }

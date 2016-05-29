@@ -32,14 +32,28 @@ public class RequestObstacles {
     // а и не мога да тествам нищо без телефон...
 
     private List<Obstacle> obstacles;
+    private List<Obstacle> noObstacles;
 
     public RequestObstacles() {
         this.obstacles = new ArrayList<>();
+        this.noObstacles = new ArrayList<>();
         new GetObstaclesTask().execute();
     }
 
     public List<Obstacle> getObstacles() {
         return new ArrayList<>(obstacles);
+    }
+
+    public List<Obstacle> getNoObstacles(){
+        return noObstacles;
+    }
+
+    private void initNoObstacles(){
+        for (Obstacle obstacle: obstacles) {
+            if(obstacle.getState() == 0){
+                noObstacles.add(obstacle);
+            }
+        }
     }
 
     private class GetObstaclesTask extends AsyncTask<Void, Void, String> {
@@ -52,6 +66,7 @@ public class RequestObstacles {
         @Override
         protected void onPostExecute(String obstaclesStr) {
             ParseJsonData(obstaclesStr);
+            initNoObstacles();
         }
 
         private String getObstacles() {
