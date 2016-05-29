@@ -45,7 +45,7 @@ public class ReportForm extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-               
+
 
                 String msg = new String(lat + "|" + lng);
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
