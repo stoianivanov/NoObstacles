@@ -49,8 +49,7 @@ public class MainActivity extends FragmentActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener
-        {
+        View.OnClickListener {
     // LocationListener {
 
     private GoogleMap mMap;
@@ -101,7 +100,7 @@ public class MainActivity extends FragmentActivity implements
         }
 
 
-        mProblemBtn =(Button) findViewById(R.id.report_problem);
+        mProblemBtn = (Button) findViewById(R.id.report_problem);
         mProblemBtn.setOnClickListener(this);
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
@@ -109,7 +108,7 @@ public class MainActivity extends FragmentActivity implements
             public void onMapClick(LatLng point) {
 
                 // Already two locations
-                if(markerPoints.size()>1){
+                if (markerPoints.size() > 0) {
                     markerPoints.clear();
                     mMap.clear();
                 }
@@ -127,20 +126,25 @@ public class MainActivity extends FragmentActivity implements
                  * For the start location, the color of marker is GREEN and
                  * for the end location, the color of marker is RED.
                  */
-                if(markerPoints.size()==1){
+                if (markerPoints.size() == 1) {
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                }else if(markerPoints.size()==2){
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                }
+                }/*else if(markerPoints.size()==2){
+                        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    }*/
 
 
                 // Add new marker to the Google Map Android API V2
                 mMap.addMarker(options);
+                Location userLocation = mMap.getMyLocation();
+                LatLng myLocation = null;
+                if (userLocation != null) {
+                    myLocation = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+                }
 
                 // Checks, whether start and end locations are captured
-                if(markerPoints.size() >= 2){
-                    LatLng origin = markerPoints.get(0);
-                    LatLng dest = markerPoints.get(1);
+                if (markerPoints.size() >= 0) {
+                    LatLng origin = myLocation;
+                    LatLng dest = markerPoints.get(0);
 
                     // Getting URL to the Google Directions API
                     String url = getDirectionsUrl(origin, dest);
@@ -183,14 +187,14 @@ public class MainActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         enableMyLocation();
-                Location userLocation = mMap.getMyLocation();
-                LatLng myLocation = null;
-                if (userLocation != null) {
-                        myLocation = new LatLng(userLocation.getLatitude(),
-                                        userLocation.getLongitude());
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,
-                                        mMap.getMaxZoomLevel() - 5));
-                }
+        Location userLocation = mMap.getMyLocation();
+        LatLng myLocation = null;
+        if (userLocation != null) {
+            myLocation = new LatLng(userLocation.getLatitude(),
+                    userLocation.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,
+                    mMap.getMaxZoomLevel() - 5));
+        }
     }
 
 //    @Override
@@ -235,9 +239,12 @@ public class MainActivity extends FragmentActivity implements
         if (mLastLocation != null) {
             textViewLatitude.setText(String.valueOf(mLastLocation.getLatitude()));
             lat = mLastLocation.getLatitude();
+
             textViewLongitude.setText(String.valueOf(mLastLocation.getLongitude()));
             lng = mLastLocation.getLongitude();
 
+            LatLng point = new LatLng(lat, lng);
+            markerPoints.add(point);
             LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mMap.addMarker(new MarkerOptions().position(currentLocation).title("You are here!"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
@@ -274,8 +281,23 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        if(id == mProblemBtn.getId()){
+        if (id == mProblemBtn.getId()) {
             Intent intent = new Intent(this, ReportForm.class);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            lat = mLastLocation.getLatitude();
+            lng = mLastLocation.getLongitude();
+            Log.d("cordination", lat + "    " + lng);
             intent.putExtra("Latitude", lat.toString());
             intent.putExtra("Longitude", lng.toString());
             startActivity(intent);

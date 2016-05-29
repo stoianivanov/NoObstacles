@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,7 +51,7 @@ public class ReportForm extends Activity {
 
         ArrayAdapter adapter = new ArrayAdapter<String>(this, R.layout.report_form_adapter_layout, problems);
 
-        ListView listView = (ListView) findViewById(R.id.problems_list);
+        final ListView listView = (ListView) findViewById(R.id.problems_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -59,9 +60,12 @@ public class ReportForm extends Activity {
                 double longitude = Double.parseDouble(lng);
                 TextView textViewProblems = (TextView) findViewById(R.id.problems);
                 String type;
+
                 String typeBg = textViewProblems.getText().toString();
-                int index = Arrays.asList(problems).indexOf(typeBg);
-                switch (index) {
+                Log.d("FFFFFFFFF","" +l);
+                int index = Arrays.asList(problems).indexOf(l);
+
+                switch ((int)l) {
                     case 0:
                         type = "noramp";
                         break;
@@ -152,6 +156,7 @@ public class ReportForm extends Activity {
         protected void onPostExecute(String result) {
             String msg = new String(lat + "|" + lng);
             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 }
