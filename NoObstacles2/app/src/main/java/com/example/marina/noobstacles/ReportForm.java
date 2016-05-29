@@ -1,6 +1,7 @@
 package com.example.marina.noobstacles;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,7 +12,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Arrays;
 
 public class ReportForm extends Activity {
 
@@ -93,5 +104,54 @@ public class ReportForm extends Activity {
             }
         });
     }
+    private class AddObstacleAsync extends AsyncTask<String, Void, String> {
 
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                return addObstacle(params[0]);
+            } catch (IOException e) {
+                String errMessage = e.getMessage();
+                return errMessage;
+            }
+        }
+
+        private String addObstacle(String obstacleToAdd) throws IOException {
+            URL baseUrl = new URL("http://dirigible.eclipse.org//services/js/NoObstaclesApp/obstacles.js");
+            HttpURLConnection urlConnection = (HttpURLConnection) baseUrl.openConnection();
+
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+
+            OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
+            out.write(obstacleToAdd);
+            out.close();
+
+            urlConnection.connect();
+
+            int responseCode = urlConnection.getResponseCode();
+            if (responseCode > 201) {
+                return urlConnection.getResponseMessage();
+            }
+
+            InputStream is = urlConnection.getInputStream();
+            int numberOfChars;
+            StringBuffer sb = new StringBuffer();
+            while ((numberOfChars = is.read()) != -1) {
+                sb.append((char) numberOfChars);
+            }
+
+            return sb.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            String msg = new String(lat + "|" + lng);
+            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+        }
+    }
 }
