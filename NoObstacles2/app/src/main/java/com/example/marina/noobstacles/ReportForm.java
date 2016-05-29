@@ -44,11 +44,52 @@ public class ReportForm extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                double latitude = Double.parseDouble(lat);
+                double longitude = Double.parseDouble(lng);
+                TextView textViewProblems = (TextView) findViewById(R.id.problems);
+                String type;
+                String typeBg = textViewProblems.getText().toString();
+                int index = Arrays.asList(problems).indexOf(typeBg);
+                switch (index) {
+                    case 0:
+                        type = "noramp";
+                        break;
+                    case 1:
+                        type = "brkramp";
+                        break;
+                    case 2:
+                        type = "hole";
+                        break;
+                    case 3:
+                        type = "car";
+                        break;
+                    case 4:
+                        type = "pavement";
+                        break;
+                    case 5:
+                        type = "bus";
+                        break;
+                    case 6:
+                        type = "roadblock";
+                        break;
+                    case 7:
+                        type = "tempblock";
+                        break;
+                    case 8:
+                        type = "other";
+                        break;
+                    default:
+                        type = "other";
+                        break;
+                }
 
+                Log.d("Type", type);
+                int state = 0;
 
-
-                String msg = new String(lat + "|" + lng);
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                Obstacle obstacle = new Obstacle(latitude, longitude, type, state);
+                Gson gsonObstacle = new Gson();
+                String jsonObstacle = gsonObstacle.toJson(obstacle);
+                new AddObstacleAsync().execute(jsonObstacle);
             }
         });
     }
