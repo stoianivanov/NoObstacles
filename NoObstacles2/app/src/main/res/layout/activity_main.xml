@@ -16,7 +16,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Report Obstacle"
+        android:text="Докладвай"
         android:id="@+id/report_problem"
         android:layout_gravity="center_horizontal"
 
@@ -24,12 +24,14 @@
     <TextView
         android:id="@+id/tv_latitude"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/tv_longitude"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
 
 

@@ -1,13 +1,11 @@
 package com.example.marina.noobstacles;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -19,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -31,8 +31,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,6 +57,8 @@ public class MainActivity extends FragmentActivity implements
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
 
+
+    private String URLLLL = "";
     private ArrayList<LatLng> markerPoints;
     private TextView textViewLatitude;
     private TextView textViewLongitude;
@@ -94,11 +97,13 @@ public class MainActivity extends FragmentActivity implements
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
+            // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
+            // See https://g.co/AppIndexing/AndroidStudio for more information.
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
-                    .build();
+                    .addApi(AppIndex.API).build();
         }
 
 
@@ -261,6 +266,19 @@ public class MainActivity extends FragmentActivity implements
         Log.d("LOG", "Start");
         mGoogleApiClient.connect();
         super.onStart();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.marina.noobstacles/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
     }
 
     @Override
@@ -268,6 +286,19 @@ public class MainActivity extends FragmentActivity implements
         Log.d("LOG", "Stop");
         mGoogleApiClient.disconnect();
         super.onStop();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.marina.noobstacles/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
     @Override
@@ -336,19 +367,20 @@ public class MainActivity extends FragmentActivity implements
         String sensor = "sensor=false";
 
         // Building the parameters to the web service
-        String parameters = str_origin+"&"+str_dest+"&"+sensor;
+        String parameters = str_origin+"&"+str_dest+"&"+sensor+"&mode=walking";
 
         // Output format
         String output = "json";
 
         // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters;
+        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters ;
 
 
         return url;
     }
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
+        URLLLL = strUrl;
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
         try{
@@ -390,6 +422,32 @@ public class MainActivity extends FragmentActivity implements
     // Fetches data from url passed
     private class DownloadTask extends AsyncTask<String, Void, String>{
 
+        public String getRightPath(List<Point> points, List<Obstacle> obstacles, List<Obstacle> with){
+            String url = URLLLL;
+            boolean isFirst = true;
+            Log.d("EMPTY", points.size() + "");
+            Log.d("EMPTY", obstacles.size() + "");
+            Log.d("EMPTY", with.size() + "");
+            if(points.size() != 0) {
+                for (Point point : points) {
+                    for (Obstacle o : obstacles) {
+                        if (point.isProblem(o, point)) {
+                            for (Obstacle ob : with)
+                                if (point.isGoodPoint(ob, point)) {
+                                    if (isFirst) {
+                                        Log.d("LASTLOGAddgoodpoint", ob.toString());
+                                        url += "&waypoints=optimize:true|" + ob.getLatitude() + "," + ob.getLongitude();
+                                        isFirst = false;
+                                    }
+                                    url += "|" + ob.getLatitude() + "," + ob.getLongitude();
+                                }
+                        }
+                    }
+
+                }
+            }
+            return url;
+        }
         // Downloading data in non-ui thread
         @Override
         protected String doInBackground(String... url) {
@@ -400,6 +458,18 @@ public class MainActivity extends FragmentActivity implements
             try{
                 // Fetching the data from web service
                 data = downloadUrl(url[0]);
+                Log.d("LASTLOG", URLLLL);
+
+                List<Point> notParsePath = parseJsonData(data);
+
+
+                    List<Obstacle> obstacles = obstaclesss.getNoObstacles();
+                    List<Obstacle> withObstacles1 = obstaclesss.getWthObstacles();
+                    //String newURL = getRightPath(notParsePath, obstacles, withObstacles1);
+
+                    data = downloadUrl(getRightPath(notParsePath, obstacles, withObstacles1));
+                    Log.d("LASTLOG", URLLLL);
+
             }catch(Exception e){
                 Log.d("Background Task",e.toString());
             }
@@ -413,15 +483,103 @@ public class MainActivity extends FragmentActivity implements
             super.onPostExecute(result);
 
             ParserTask parserTask = new ParserTask();
-
+            parseJsonData(result);
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
 
+        }
+
+        private ArrayList<Point> parseJsonData(String gogleResponseStr) {
+            ArrayList<Point> points = new ArrayList<>();
+            Log.d("RADOEGEI","RADOEGEI");
+            JSONObject json = null;
+            try {
+                json = new JSONObject(gogleResponseStr);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("RADOEGEI","RADOEGEI");
+            JSONArray routesJson = null;
+            try {
+//                stepsJson = json.getJSONArray("routes").getJSONArray(0).getJSONArray(2).getJSONArray(6);
+                routesJson = json.getJSONArray("routes");
+                Log.d("STEPS", routesJson.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            for (int i = 0; i < routesJson.length(); ++i) {
+                JSONObject route = null;
+                try {
+                    route = routesJson.getJSONObject(i);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d("RADOEGEI","RADOEGEI");
+                JSONArray legsJson = null;
+                try {
+                    legsJson = route.getJSONArray("legs");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                for(int j = 0; j < legsJson.length(); ++j){
+                    JSONObject leg = null;
+                    try {
+                         leg = legsJson.getJSONObject(j);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    JSONArray stepJSON = null;
+                    try {
+                        stepJSON = leg.getJSONArray("steps");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    for(int k = 0; k<stepJSON.length(); ++k){
+                        JSONObject step = null;
+                        try {
+                            step = stepJSON.getJSONObject(k);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        JSONObject starLocation = null;
+                        try {
+                            starLocation = step.getJSONObject("start_location");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        Point point = new Point();
+                        double latitude = 0;
+                         try {
+                             latitude = Double.parseDouble(starLocation.getString("lat"));
+                            point.setLat(latitude);
+                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        double longitude = 0;
+                        try {
+                            longitude = Double.parseDouble(starLocation.getString("lng"));;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        point.setLng(longitude);
+                        points.add(point);
+                        Log.d("RADOEGEI", "RADOEGEI");
+                    }
+                }
+
+            }
+            Log.d("RADOEGEI", "RADOEGEI");
+            return points;
         }
     }
 
     /** A class to parse the Google Places in JSON format */
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>> > {
+
 
         // Parsing the data in non-ui thread
         @Override
@@ -479,6 +637,7 @@ public class MainActivity extends FragmentActivity implements
             mMap.addPolyline(lineOptions);
         }
     }
+
 
 
     @Override

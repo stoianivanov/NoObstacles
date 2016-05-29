@@ -23,20 +23,14 @@ import java.util.List;
  */
 public class RequestObstacles {
 
-    /**
-     * Should do the magic....
-     * If not, move everything except constructor and getObstacles in the class you need it
-     */
-
-    // Знам, че е много тъпо в момента, но не знам къде ще го ползваме и затова е в отделен клас,
-    // а и не мога да тествам нищо без телефон...
-
     private List<Obstacle> obstacles;
     private List<Obstacle> noObstacles;
+    private List<Obstacle> withObstacles;
 
     public RequestObstacles() {
         this.obstacles = new ArrayList<>();
         this.noObstacles = new ArrayList<>();
+        this.withObstacles = new ArrayList<>();
         new GetObstaclesTask().execute();
     }
 
@@ -47,11 +41,22 @@ public class RequestObstacles {
     public List<Obstacle> getNoObstacles(){
         return noObstacles;
     }
+    public List<Obstacle> getWthObstacles(){
+        return withObstacles;
+    }
 
-    private void initNoObstacles(){
+
+    public void initNoObstacles(){
         for (Obstacle obstacle: obstacles) {
             if(obstacle.getState() == 0){
                 noObstacles.add(obstacle);
+            }
+        }
+    }
+    public void initWithObstacles(){
+        for (Obstacle obstacle: obstacles) {
+            if(obstacle.getState() == 1){
+                withObstacles.add(obstacle);
             }
         }
     }
@@ -67,6 +72,7 @@ public class RequestObstacles {
         protected void onPostExecute(String obstaclesStr) {
             ParseJsonData(obstaclesStr);
             initNoObstacles();
+            initWithObstacles();
         }
 
         private String getObstacles() {
