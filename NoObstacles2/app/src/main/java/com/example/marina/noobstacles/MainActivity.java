@@ -58,12 +58,18 @@ public class MainActivity extends FragmentActivity implements
     private Location mLastLocation;
 
 
+
+    private List<Obstacle> obstacles ;
+    private List<Obstacle> withObstacles1;
+
+
     private String URLLLL = "";
     private ArrayList<LatLng> markerPoints;
     private TextView textViewLatitude;
     private TextView textViewLongitude;
     private  RequestObstacles obstaclesss;
     private Button mProblemBtn;
+    private Button mShowObstaclesButton;
 
     private Double lat;
     private Double lng;
@@ -84,6 +90,7 @@ public class MainActivity extends FragmentActivity implements
 
         obstaclesss = new RequestObstacles();
 
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -92,7 +99,8 @@ public class MainActivity extends FragmentActivity implements
 
         textViewLatitude = (TextView) findViewById(R.id.tv_latitude);
         textViewLongitude = (TextView) findViewById(R.id.tv_longitude);
-
+        mShowObstaclesButton = (Button) findViewById(R.id.show_obstacles);
+        mShowObstaclesButton.setOnClickListener(this);
         markerPoints = new ArrayList<LatLng>();
 
         // Create an instance of GoogleAPIClient.
@@ -335,6 +343,8 @@ public class MainActivity extends FragmentActivity implements
             intent.putExtra("Latitude", lat.toString());
             intent.putExtra("Longitude", lng.toString());
             startActivity(intent);
+        } else if(id == mShowObstaclesButton.getId()) {
+            showAllObstacles();
         }
     }
 
@@ -463,8 +473,8 @@ public class MainActivity extends FragmentActivity implements
                 List<Point> notParsePath = parseJsonData(data);
 
 
-                    List<Obstacle> obstacles = obstaclesss.getNoObstacles();
-                    List<Obstacle> withObstacles1 = obstaclesss.getWthObstacles();
+                    obstacles = obstaclesss.getNoObstacles();
+                    withObstacles1 = obstaclesss.getWthObstacles();
                     //String newURL = getRightPath(notParsePath, obstacles, withObstacles1);
 
                     data = downloadUrl(getRightPath(notParsePath, obstacles, withObstacles1));
@@ -638,7 +648,26 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    public void showAllObstacles(){
 
+        LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        List<Obstacle> obstacles = obstaclesss.getAllGoodObstaclesInRange(currentLocation, new Double(0.01));
+        for(Obstacle point : obstacles){
+            currentLocation = new LatLng(point.getLatitude(),point.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(currentLocation).title("On this position we have any obstacles")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+
+        }
+        obstacles = obstaclesss.getAllBadObstaclesInRange(currentLocation, new Double(0.01));
+        for(Obstacle point : obstacles){
+            currentLocation = new LatLng(point.getLatitude(),point.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(currentLocation).title("On this position we have any obstacles")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

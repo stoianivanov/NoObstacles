@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +47,31 @@ public class RequestObstacles {
         return withObstacles;
     }
 
+    public List<Obstacle> getAllGoodObstaclesInRange(LatLng position,Double range){
+        Log.d("inrange",position.latitude +" |"+ position.longitude);
+        List<Obstacle> obstaclesInRange = new ArrayList<>();
+        for (Obstacle o : obstacles) {
+            if(Math.abs(o.getLatitude() - position.latitude)<= range && Math.abs(o.getLongitude() - position.longitude) <= range &&
+                    o.getState() == 0){
+                Log.d("inrange",o.toString());
+                obstaclesInRange.add(o);
+            }
+        }
+        return  obstaclesInRange;
+    }
 
+    public List<Obstacle> getAllBadObstaclesInRange(LatLng position,Double range){
+        Log.d("inrange",position.latitude +" |"+ position.longitude);
+        List<Obstacle> obstaclesInRange = new ArrayList<>();
+        for (Obstacle o : obstacles) {
+            if(Math.abs(o.getLatitude() - position.latitude)<= range && Math.abs(o.getLongitude() - position.longitude) <= range &&
+                    o.getState() == 1){
+                Log.d("inrange",o.toString());
+                obstaclesInRange.add(o);
+            }
+        }
+        return  obstaclesInRange;
+    }
     public void initNoObstacles(){
         for (Obstacle obstacle: obstacles) {
             if(obstacle.getState() == 0){
