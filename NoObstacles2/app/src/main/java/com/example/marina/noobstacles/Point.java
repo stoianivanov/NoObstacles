@@ -45,7 +45,7 @@ public class Point {
 
     public boolean isProblem(Obstacle obstacle, Point point){
         if (obstacle.getState() == 0){
-            if(obstacle.getLatitude() - point.getLat() < new Double(10)){
+            if(obstacle.getLatitude() - point.getLat() < new Double(0.01)){
                 return true;
             }else{
                 return false;
@@ -55,7 +55,7 @@ public class Point {
     }
     public Boolean isGoodPoint(Obstacle obstacle, Point point){
         if (obstacle.getState() == 1){
-            if(obstacle.getLatitude() - point.getLat() < new Double(10)){
+            if(obstacle.getLatitude() - point.getLat() < new Double(0.01)){
                 return true;
             }else{
                 return false;
